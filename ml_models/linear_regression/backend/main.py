@@ -34,11 +34,15 @@ def obtener_modelo():
     }
 
 
+def estimar_precio(superficie: float) -> float:
+    # predict recibe una tabla: una fila con la superficie indicada.
+    precio = model.predict([[superficie]])[0]
+    return round(float(precio), 2)
+
+
 @app.post('/predecir', summary='Predecir el precio de una vivienda')
 def predecir(vivienda: Vivienda):
-    # predict recibe una tabla: una fila con la superficie indicada.
-    precio = model.predict([[vivienda.superficie]])[0]
     return {
         'superficie_m2': vivienda.superficie,
-        'precio_estimado_cop': round(float(precio), 2),
+        'precio_estimado_cop': estimar_precio(vivienda.superficie),
     }

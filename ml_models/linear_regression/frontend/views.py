@@ -21,20 +21,25 @@ def inicio(request):
     precio = None
 
     if formulario.is_valid():
-        try:
-            consulta = Request(
-                f'{settings.BACKEND_URL}/predecir',
-                data=json.dumps(formulario.cleaned_data).encode('utf-8'),
-                headers={'Content-Type': 'application/json'},
-                method='POST',
-            )
-            with urlopen(consulta, timeout=5) as respuesta:
-                precio = json.load(respuesta)['precio_estimado_cop']
-        except (URLError, TimeoutError, ValueError, KeyError):
-            formulario.add_error(None, 'No se pudo obtener la predicción. Intenta de nuevo.')
+        if settings.ESTIMADOR_INTEGRADO:
+            from backend.main import estimar_precio
+
+            precio = estimar_precio(formulario.cleaned_data['superficie'])
+        else:
+            try:
+                consulta = Request(
+                    f'{settings.BACKEND_URL}/predecir',
+                    data=json.dumps(formulario.cleaned_data).encode('utf-8'),
+                    headers={'Content-Type': 'application/json'},
+                    method='POST',
+                )
+                with urlopen(consulta, timeout=5) as respuesta:
+                    precio = json.load(respuesta)['precio_estimado_cop']
+            except (URLError, TimeoutError, ValueError, KeyError):
+                formulario.add_error(None, 'No se pudo obtener la predicción. Intenta de nuevo.')
 
     return render(request, 'inicio.html', {
         'formulario': formulario,
         'precio': precio,
-        'swagger_url': f'{settings.BACKEND_URL}/docs',
+        'swagger_url': settings.SWAGGER_URL,
     })

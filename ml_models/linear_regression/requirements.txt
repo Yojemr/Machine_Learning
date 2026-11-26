@@ -1,0 +1,7 @@
+Django>=5.2.8,<5.3
+fastapi
+uvicorn
+scikit-learn==1.9.1
+joblib
+pydantic
+numpy
