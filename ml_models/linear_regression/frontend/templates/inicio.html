@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Estimador de precio de vivienda | Regresión lineal</title>
+    <meta name="description" content="Estima el precio de una vivienda en pesos colombianos a partir de su superficie. Demostración académica de regresión lineal.">
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAArUlEQVR4nO2WQQ7DIAwEHV5RPyucw+t677f2G5UiNSLFxQbMoRJ7yHGH7C5Ktsex00yFqe60AAatDnLh+aJ5EeF0Lxn+HeDOCO6mnKIzAFL0bgDc3b+O79wBF+6jAPyOvg0AaYL16C9t6vcAhRGnqEZvBcBwzIq7EtG4O9lL5hRVrzaAuBD+YPJnXXIHlv31v4Fxf50A+/46AbnjuDuJEdkL9LnJg1p/Far+P6I3RPo+pbjO7o8AAAAASUVORK5CYII=">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #f1f5f4; color: #173331; font: 1rem/1.55 system-ui, sans-serif; }
+        .pagina { max-width: 620px; width: calc(100% - 2rem); margin: clamp(1.5rem, 6vh, 3rem) auto 2rem; }
+        main { padding: clamp(1.2rem, 5vw, 2rem); border: 1px solid #cbdad7;
+               border-radius: 16px; background: white; }
+        h1 { margin: 0; line-height: 1.15; font-size: clamp(1.7rem, 5vw, 2.4rem); }
+        p { margin: 0; }
+        .modelo { margin-bottom: .55rem; color: #185c51; font-weight: 700; font-size: .88rem; }
+        .introduccion { margin: .65rem 0 1.4rem; color: #3d5a54; }
+        label { display: block; font-weight: 650; margin-bottom: .35rem; }
+        input, button { width: 100%; font: inherit; border-radius: 7px; padding: .65rem .85rem; }
+        input { border: 1px solid #738d88; }
+        button { margin-top: 1rem; background: #185c51; color: white; border: 0; font-weight: 650; cursor: pointer; }
+        button:hover { background: #12493f; }
+        .ayuda { margin-top: .35rem; color: #3d5a54; font-size: .9rem; }
+        input[aria-invalid="true"] { border-color: #982823; }
+        :focus-visible { outline: 3px solid #366eaa; outline-offset: 3px; }
+        .resultado { margin-top: 1.25rem; padding: 1rem; background: #e5f4ee; border-radius: 9px; }
+        .resultado h2 { font-size: 1rem; margin: 0 0 .2rem; }
+        .importe { font-weight: 750; font-size: clamp(1.2rem, 4vw, 1.7rem); overflow-wrap: anywhere; }
+        .reiniciar { display: inline-block; margin-top: .65rem; }
+        .errorlist { padding-left: 1.2rem; color: #982823; }
+        details { margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid #cbdad7; }
+        summary { font-weight: 650; cursor: pointer; }
+        details p { margin-top: .55rem; color: #3d5a54; }
+        .documentacion { margin: 1.4rem 0 0; }
+        .pie { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem 1rem;
+               margin-top: 1rem; padding: .95rem 1.25rem; border: 1px solid #cbdad7;
+               border-radius: 12px; background: #e5f4ee; font-size: .9rem; }
+        .pie p { margin: 0; }
+        .pie .programa { color: #3d5a54; }
+        .pie .ficha { margin-inline-start: auto; white-space: nowrap; color: #185c51;
+                 font-weight: 650; font-variant-numeric: tabular-nums; }
+        a { color: #185c51; }
+        @media (max-width: 420px) {
+            .pagina { margin-top: 1rem; }
+            main { padding: 1.2rem; }
+            .pie { padding: .9rem 1.2rem; }
+            .pie .ficha { margin-inline-start: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="pagina">
+    <main>
+        <header>
+            <p class="modelo">Regresión lineal</p>
+            <h1>Estimador de vivienda</h1>
+            <p class="introduccion">Ingresa la superficie para obtener un precio estimado en pesos colombianos.</p>
+        </header>
+        <form method="post">
+            {% csrf_token %}
+            {{ formulario.non_field_errors }}
+            {{ formulario.superficie.label_tag }}
+            {{ formulario.superficie }}
+            <p class="ayuda" id="{{ formulario.superficie.auto_id }}_helptext">{{ formulario.superficie.help_text }}</p>
+            {{ formulario.superficie.errors }}
+            <button type="submit">Estimar precio</button>
+        </form>
+        {% if precio is not None %}
+        <section class="resultado" aria-labelledby="titulo-resultado">
+            <h2 id="titulo-resultado">Precio estimado para {{ formulario.cleaned_data.superficie|floatformat:"-3" }} m²</h2>
+            <p class="importe">$ {{ precio|floatformat:"2g" }} COP</p>
+            <a class="reiniciar" href="{% url 'inicio' %}">Hacer otra estimación</a>
+        </section>
+        {% endif %}
+        <details>
+            <summary>Cómo se calcula la estimación</summary>
+            <p>El modelo aprende una relación lineal entre la superficie y el precio a partir de ejemplos de entrenamiento. La superficie es la única variable de este ejercicio académico.</p>
+        </details>
+        <p class="documentacion"><a href="http://127.0.0.1:8000/docs">Ver documentación en Swagger</a></p>
+    </main>
+    <footer class="pie">
+        <div>
+            <strong>Juan Esteban Maya Rodríguez</strong>
+            <p class="programa">Análisis y Desarrollo de Software</p>
+        </div>
+        <p class="ficha">Ficha: 3494620</p>
+    </footer>
+    </div>
+</body>
+</html>

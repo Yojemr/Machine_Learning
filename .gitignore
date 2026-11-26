@@ -1,0 +1,13 @@
+.venv/
+venv/
+__pycache__/
+.ipynb_checkpoints/
+.env
+.env.*
+!.env.example
+*.log
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.sqlite3
+/data_load/data/dataset_ventas.xlsx
